@@ -1,0 +1,312 @@
+1. Objective
+
+The Bug Submission Module provides an interface through which developers can submit software bug information to the Intelligent Bug Diagnosis Platform.
+
+The module supports both direct text input and file upload for bug descriptions, stack traces, and error logs.
+
+The submitted information is validated, processed, and stored so that it can be used by the subsequent bug diagnosis pipeline.
+
+ 2. Main Features
+
+The Bug Submission Module provides the following features:
+
+- Bug title submission
+- Bug description submission
+- Stack trace submission
+- Error log submission
+- Bug report file upload
+- Log file upload
+- File type validation
+- Input validation
+- Submission status
+- Storage of submitted bug information
+
+ 3. Supported Input Methods
+
+3.1 Direct Text Input
+
+The developer can directly enter information into the submission interface.
+
+The following fields are supported:
+
+- Bug Title
+- Bug Description
+- Stack Trace
+- Error Logs
+- Affected Component
+3.2 File Upload
+
+The developer can upload bug reports and log files.
+
+The initial prototype supports:
+
+- `.txt`
+- `.log`
+- `.json`
+- `.csv`
+
+The uploaded files are validated before being processed.
+
+
+ 4. Bug Submission Interface
+
+The proposed interface contains the following fields:
++------------------------------------------+
+|        Intelligent Bug Diagnosis         |
++------------------------------------------+
+| Bug Title:                               |
+| [                                      ] |
+|                                          |
+| Bug Description:                         |
+| [                                      ] |
+| [                                      ] |
+|                                          |
+| Stack Trace:                             |
+| [                                      ] |
+| [                                      ] |
+|                                          |
+| Error Logs:                              |
+| [                                      ] |
+| [                                      ] |
+|                                          |
+| Affected Component:                      |
+| [                                      ] |
+|                                          |
+| Upload Bug / Log File:                   |
+| [ Choose File ]                          |
+|                                          |
+|             [ Submit Bug ]               |
++------------------------------------------+
+5. Bug Submission Workflow
+
+The submission workflow is:
+
+Developer
+    ↓
+Bug Submission Interface
+    ↓
+Enter Bug Information
+    +
+Upload Bug / Log File
+    ↓
+Input Validation
+    ↓
+Bug Report Processing
+    ↓
+Bug Report Storage
+    ↓
+Submission Confirmation
+    ↓
+Ready for Diagnosis
+6. Input Validation
+
+The system validates the submitted information before storing it.
+
+Validation includes:
+
+Checking whether required fields are provided.
+Validating uploaded file types.
+Checking whether uploaded files are readable.
+Handling empty submissions.
+Checking file size limits.
+Sanitizing input data.
+Validating structured JSON files.
+Detecting invalid or unsupported formats.
+
+The validation process prevents incomplete or invalid data from entering the diagnosis pipeline.
+
+7. Required and Optional Fields
+Field	Required	Description
+Bug Title	Yes	Short description of the bug
+Bug Description	Yes	Detailed description of the problem
+Stack Trace	No	Stack trace associated with the failure
+Error Logs	No	Error or application logs
+Affected Component	No	Component affected by the defect
+File Upload	No	Bug report or log file
+
+At least a bug title and bug description should be provided for a valid submission.
+
+8. File Upload Processing
+
+When a user uploads a file, the system performs the following steps:
+
+File Upload
+     ↓
+File Type Validation
+     ↓
+File Size Validation
+     ↓
+File Reading
+     ↓
+Content Extraction
+     ↓
+Text Cleaning
+     ↓
+Bug Report Processing
+     ↓
+Storage
+
+The extracted content can include:
+
+Error messages
+Stack traces
+Log messages
+Bug descriptions
+Metadata
+9. Bug Report Processing
+
+After validation, the submitted information is converted into a structured bug report.
+
+The processing module performs:
+
+Input validation.
+Text normalization.
+Whitespace cleanup.
+Error message extraction.
+Stack trace extraction.
+Metadata extraction.
+Structured data creation.
+Storage preparation.
+10. Proposed Backend API
+
+The initial backend API is planned using Python FastAPI.
+
+Bug Submission Endpoint
+POST /api/bugs
+
+The endpoint receives the submitted bug information and returns the submission status.
+
+File Upload Endpoint
+POST /api/bugs/upload
+
+The endpoint handles uploaded bug reports and log files.
+
+Get Submission Endpoint
+GET /api/bugs/{submission_id}
+
+The endpoint retrieves a previously submitted bug report.
+
+11. Example Submission Request
+
+A structured bug submission can contain:
+
+{
+  "title": "Application crashes while opening profile",
+  "description": "The application crashes when the user opens the profile page.",
+  "stack_trace": "NullPointerException at ProfileService.java:45",
+  "error_logs": "ERROR ProfileService - Null reference encountered",
+  "component": "Profile Service"
+}
+12. Example Submission Response
+
+After successful submission, the backend can return:
+
+{
+  "submission_id": "BUG-0001",
+  "status": "Submitted",
+  "message": "Bug report submitted successfully."
+}
+13. Storage
+
+The submitted bug reports are stored using the bug report schema defined in the M1.2 data model.
+
+The initial prototype proposes SQLite as the submission database.
+
+Stored information includes:
+
+Submission ID
+Bug title
+Bug description
+Stack trace
+Error logs
+Component
+Uploaded file information
+Processing status
+Submission timestamp
+14. Error Handling
+
+The Bug Submission Module handles common submission errors.
+
+Empty Submission
+Error: Bug title and description are required.
+Unsupported File
+Error: Unsupported file format.
+Invalid File
+Error: Unable to read the uploaded file.
+Large File
+Error: Uploaded file exceeds the permitted size.
+
+The system should provide clear messages so that the developer can correct the submission.
+
+15. Security Considerations
+
+The submission module should apply basic security controls when processing user input and uploaded files.
+
+These include:
+
+File type validation
+File size restrictions
+Input sanitization
+Safe file handling
+Avoiding execution of uploaded files
+Protection against malicious input
+Secure handling of API requests
+
+Uploaded files are treated as data and are not executed by the system.
+
+16. Connection with Diagnosis Pipeline
+
+The Bug Submission Module acts as the starting point of the diagnosis workflow.
+
+Bug Submission
+       ↓
+Bug Processing
+       ↓
+Structured Bug Report
+       ↓
+Agent Orchestrator
+       ↓
+AI Agent Layer
+       ↓
+RAG Retrieval
+       ↓
+Historical Defect Search
+       ↓
+Root Cause Analysis
+       ↓
+Fix Recommendation
+17. Technology Used
+Component	Technology
+Frontend	React.js
+Backend	Python / FastAPI
+Database	SQLite
+API Format	REST API
+Data Format	JSON
+File Processing	Python
+Version Control	Git / GitHub
+18. Milestone 1 Scope
+
+The Bug Submission Module in Milestone 1 focuses on:
+
+Creating the submission interface.
+Supporting direct bug report input.
+Supporting stack trace input.
+Supporting error log input.
+Supporting file uploads.
+Validating submitted information.
+Processing submitted information.
+Storing submitted bug reports.
+
+Advanced automated diagnosis and fix recommendation capabilities will be integrated with this module in subsequent milestones.
+
+19. Expected Outcome
+
+At the completion of M1.3, the platform will provide a functional foundation for receiving software defect information.
+
+Developers will be able to submit bug descriptions, stack traces, error logs, and supported bug report files. The submitted information will be validated, structured, and stored for further processing by the AI-powered diagnosis pipeline.
+
+20. Conclusion
+
+The Bug Submission Module provides the entry point for the Intelligent Bug Diagnosis Platform.
+
+It enables developers to submit software defects in both text and file formats. Through validation, processing, and storage, the module prepares reliable bug information for historical defect retrieval, AI-agent analysis, root cause identification, and fix recommendation in subsequent stages of the project.
