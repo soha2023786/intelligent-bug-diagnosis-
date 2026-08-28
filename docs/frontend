@@ -1,0 +1,149 @@
+import streamlit as st
+import requests
+
+# Backend API URL
+BACKEND_URL = "http://localhost:8000"
+
+st.set_page_config(
+    page_title="Intelligent Bug Diagnosis Platform",
+    page_icon="🐞",
+    layout="wide"
+)
+
+st.title("🐞 Intelligent Bug Diagnosis Platform")
+st.subheader("Bug Submission Module")
+
+st.write(
+    "Submit a bug report by providing its description, "
+    "stack trace, error logs, or an optional supporting file."
+)
+
+# Bug information
+title = st.text_input(
+    "Bug Title",
+    placeholder="Example: Application crashes during login"
+)
+
+description = st.text_area(
+    "Bug Description",
+    placeholder="Describe the problem, expected behavior, and actual behavior.",
+    height=150
+)
+
+component = st.text_input(
+    "Affected Component",
+    placeholder="Example: Authentication Module"
+)
+
+stack_trace = st.text_area(
+    "Stack Trace",
+    placeholder="Paste the complete stack trace here...",
+    height=200
+)
+
+error_logs = st.text_area(
+    "Error Logs",
+    placeholder="Paste relevant error logs here...",
+    height=200
+)
+
+st.markdown("### Upload Supporting File")
+
+uploaded_file = st.file_uploader(
+    "Upload a bug report or error log",
+    type=["txt", "log", "json", "csv"]
+)
+
+# Submit button
+if st.button("Submit Bug Report", type="primary"):
+
+    if not title.strip():
+        st.error("Please enter a bug title.")
+
+    elif not description.strip():
+        st.error("Please enter a bug description.")
+
+    else:
+        try:
+
+            # File upload submission
+            if uploaded_file is not None:
+
+                files = {
+                    "file": (
+                        uploaded_file.name,
+                        uploaded_file.getvalue(),
+                        uploaded_file.type
+                    )
+                }
+
+                data = {
+                    "title": title,
+                    "description": description,
+                    "component": component
+                }
+
+                response = requests.post(
+                    f"{BACKEND_URL}/api/bugs/upload",
+                    data=data,
+                    files=files,
+                    timeout=30
+                )
+
+            # Direct text submission
+            else:
+
+                data = {
+                    "title": title,
+                    "description": description,
+                    "stack_trace": stack_trace,
+                    "error_logs": error_logs,
+                    "component": component
+                }
+
+                response = requests.post(
+                    f"{BACKEND_URL}/api/bugs",
+                    data=data,
+                    timeout=30
+                )
+
+            if response.status_code == 200:
+
+                result = response.json()
+
+                st.success("Bug report submitted successfully!")
+
+                st.info(
+                    f"Submission ID: {result.get('submission_id')}"
+                )
+
+            else:
+
+                st.error(
+                    f"Submission failed: {response.text}"
+                )
+
+        except requests.exceptions.ConnectionError:
+
+            st.error(
+                "Could not connect to the backend API. "
+                "Please make sure the FastAPI server is running."
+            )
+
+        except requests.exceptions.Timeout:
+
+            st.error(
+                "The request timed out. Please try again."
+            )
+
+        except Exception as error:
+
+            st.error(
+                f"An unexpected error occurred: {error}"
+            )
+
+st.markdown("---")
+
+st.caption(
+    "Milestone 1 – M1.3 Bug Submission Module"
+)
