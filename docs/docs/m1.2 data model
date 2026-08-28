@@ -1,0 +1,309 @@
+1. Objective
+
+The purpose of the data model is to define a structured format for storing newly submitted bug reports and historical software defects.
+
+The data model supports:
+
+- Bug report submission
+- Error and stack trace storage
+- Historical defect storage
+- Semantic search
+- RAG retrieval
+- AI agent analysis
+- Diagnosis results
+- Fix recommendations
+ bug report represents a newly submitted software defect.
+
+The proposed bug report structure contains the following fields:
+
+| Field | Data Type | Description |
+|---|---|---|
+| submission_id | String | Unique identifier for the submitted bug |
+| title | String | Short title of the bug |
+| description | Text | Detailed description of the problem |
+| stack_trace | Text | Stack trace associated with the failure |
+| error_logs | Text | Error and application logs |
+| component | String | Software component affected |
+| severity | String | Severity level of the bug |
+| priority | String | Priority assigned to the bug |
+| file_name | String | Name of uploaded file, if applicable |
+| file_type | String | Type of uploaded file |
+| status | String | Current processing status |
+| created_at | DateTime | Submission date and time |
+
+---
+
+# 3. Example Bug Report
+
+```json
+{
+  "submission_id": "BUG-0001",
+  "title": "Application crashes while opening profile",
+  "description": "The application crashes when the user opens the profile page.",
+  "stack_trace": "NullPointerException at ProfileService.java:45",
+  "error_logs": "ERROR ProfileService - Null reference encountered",
+  "component": "Profile Service",
+  "severity": "High",
+  "priority": "High",
+  "file_name": "error.log",
+  "file_type": ".log",
+  "status": "Submitted",
+  "created_at": "2026-08-28T10:30:00"
+}
+4. Historical Defect Schema
+
+Historical defects are collected from public datasets associated with projects such as Mozilla, Apache, and Eclipse.
+
+The proposed standardized historical defect structure is:
+
+Field	Data Type	Description
+bug_id	String	Unique historical bug identifier
+project	String	Source project
+title	String	Historical bug title
+description	Text	Detailed bug description
+component	String	Affected software component
+severity	String	Severity of the defect
+priority	String	Priority of the defect
+stack_trace	Text	Stack trace, if available
+comments	Text	Historical discussion/comments
+resolution	String	Final resolution
+fix_information	Text	Information about the fix
+source	String	Dataset/source information
+5. Example Historical Defect
+{
+  "bug_id": "MOZ-10245",
+  "project": "Mozilla",
+  "title": "Crash when loading profile",
+  "description": "Browser crashes when profile information is loaded.",
+  "component": "Profile Management",
+  "severity": "Major",
+  "priority": "High",
+  "stack_trace": "NullPointerException at ProfileManager.java:120",
+  "comments": "The issue was reproduced and investigated.",
+  "resolution": "Fixed",
+  "fix_information": "Added null validation before accessing profile data.",
+  "source": "Mozilla Historical Defect Dataset"
+}
+6. Knowledge Base Chunk Schema
+
+Historical defect records are divided into smaller meaningful chunks before embedding generation.
+
+Each chunk contains the text and relevant metadata.
+
+Field	Data Type	Description
+chunk_id	String	Unique identifier for the chunk
+bug_id	String	Related historical bug ID
+project	String	Source project
+chunk_type	String	Type of chunk
+content	Text	Text contained in the chunk
+component	String	Affected component
+severity	String	Bug severity
+priority	String	Bug priority
+source	String	Original dataset/source
+7. Chunk Types
+
+The proposed chunk types are:
+
+Description Chunk
+
+Contains the main description of the historical bug.
+
+Stack Trace Chunk
+
+Contains technical stack trace information.
+
+Comment Chunk
+
+Contains useful historical comments and discussions.
+
+Resolution Chunk
+
+Contains the final resolution information.
+
+Fix Information Chunk
+
+Contains information about the solution or code fix.
+
+8. Example Knowledge Base Chunk
+{
+  "chunk_id": "CHUNK-0001",
+  "bug_id": "MOZ-10245",
+  "project": "Mozilla",
+  "chunk_type": "resolution",
+  "content": "The issue was fixed by adding null validation before accessing profile data.",
+  "component": "Profile Management",
+  "severity": "Major",
+  "priority": "High",
+  "source": "Mozilla Historical Defect Dataset"
+}
+9. Embedding Data
+
+After chunking, the textual content of each chunk is converted into a numerical vector using an embedding model.
+
+The proposed embedding model is:
+
+all-MiniLM-L6-v2
+
+The embedding record can contain:
+
+Field	Description
+embedding_id	Unique embedding identifier
+chunk_id	Related chunk identifier
+vector	Numerical vector representation
+model	Embedding model used
+created_at	Embedding creation time
+10. Vector Store Metadata
+
+The vector index stores embeddings while metadata is maintained to identify the original historical defect.
+
+Example:
+
+{
+  "chunk_id": "CHUNK-0001",
+  "bug_id": "MOZ-10245",
+  "project": "Mozilla",
+  "chunk_type": "resolution",
+  "severity": "Major",
+  "priority": "High"
+}
+
+This metadata allows retrieved vectors to be mapped back to their original defect information.
+
+11. Diagnosis Result Schema
+
+The final diagnosis produced by the system can be represented using the following structure:
+
+Field	Data Type	Description
+diagnosis_id	String	Unique diagnosis identifier
+submission_id	String	Related bug submission
+category	String	Bug category
+severity	String	Estimated severity
+priority	String	Estimated priority
+affected_component	String	Affected component
+error_analysis	Text	Analysis of errors/logs
+similar_bugs	Array	Retrieved historical bugs
+root_cause	Text	Probable root cause
+recommendation	Text	Suggested fix
+debugging_steps	Array	Suggested debugging steps
+confidence	Float	Confidence score
+created_at	DateTime	Diagnosis timestamp
+12. Example Diagnosis Result
+{
+  "diagnosis_id": "DIAG-0001",
+  "submission_id": "BUG-0001",
+  "category": "Application Crash",
+  "severity": "High",
+  "priority": "High",
+  "affected_component": "Profile Service",
+  "error_analysis": "A NullPointerException occurs while accessing profile data.",
+  "similar_bugs": [
+    "MOZ-10245"
+  ],
+  "root_cause": "Profile data is accessed without checking whether the object is null.",
+  "recommendation": "Add null validation before accessing profile information.",
+  "debugging_steps": [
+    "Check the profile object initialization.",
+    "Trace the ProfileService execution.",
+    "Add null validation.",
+    "Run regression tests."
+  ],
+  "confidence": 0.87,
+  "created_at": "2026-08-28T11:00:00"
+}
+13. Relationship Between Data Components
+
+The main relationships between the data components are:
+
+Bug Submission
+      |
+      ↓
+Bug Report
+      |
+      ↓
+Bug Processing
+      |
+      ↓
+Diagnosis Request
+      |
+      ├──────────────→ Historical Defect Knowledge Base
+      |                         |
+      |                         ↓
+      |                   Defect Chunks
+      |                         |
+      |                         ↓
+      |                   Embeddings
+      |                         |
+      |                         ↓
+      |                   Vector Search
+      |                         |
+      |                         ↓
+      └──────────────→ Retrieved Historical Bugs
+                                |
+                                ↓
+                         AI Agent Analysis
+                                |
+                                ↓
+                       Diagnosis Result
+14. Data Flow Between Components
+
+The data flow is:
+
+User Input
+    ↓
+Bug Report Schema
+    ↓
+Bug Processing
+    ↓
+Structured Bug Information
+    ↓
+Embedding Generation
+    ↓
+Semantic Search
+    ↓
+Historical Defect Chunks
+    ↓
+RAG Context
+    ↓
+AI Agents
+    ↓
+Diagnosis Result Schema
+    ↓
+Results Interface
+15. Data Model Design Principles
+
+The data model follows these principles:
+
+Structured Data
+Bug information is stored using predefined fields.
+Metadata Preservation
+Important metadata is retained with historical defect chunks.
+Traceability
+Retrieved chunks can be traced back to their original bug reports.
+Semantic Retrieval
+Text content can be converted into embeddings for similarity search.
+Extensibility
+Additional fields and agent outputs can be added in future milestones.
+Separation of Data
+Newly submitted bugs and historical defects are maintained as separate logical data entities.
+16. Milestone 1 Data Model Scope
+
+The data model defined in Milestone 1 covers:
+
+Bug submission schema
+Historical defect schema
+Knowledge base chunk schema
+Embedding metadata
+Vector store metadata
+Diagnosis result schema
+Data relationships
+Data flow
+
+The schema can be extended in future milestones as the implementation becomes more advanced.
+
+17. Conclusion
+
+The proposed data model provides a structured foundation for the Intelligent Bug Diagnosis Platform.
+
+It standardizes newly submitted bug reports and historical defects while preserving important technical information such as stack traces, comments, resolutions, and fix information.
+
+The model also supports the RAG pipeline by connecting historical defect chunks and their embeddings with the original bug metadata. This allows the AI agent layer to retrieve relevant historical evidence and use it during diagnosis and fix recommendation.
