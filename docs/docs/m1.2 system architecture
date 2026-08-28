@@ -1,0 +1,58 @@
+1. Objective
+The objective of the system architecture is to define the components, responsibilities, communication flow, and data flow of the Intelligent Bug Diagnosis Platform.
+The architecture is designed to support bug submission, bug processing, historical defect retrieval, semantic similarity analysis, RAG-based knowledge retrieval, AI-agent-based diagnosis, and fix recommendation.
+USER / DEVELOPER
+                           |
+                           ↓
+              BUG SUBMISSION / USER INTERFACE
+                           |
+                           ↓
+                  BACKEND / API LAYER
+                           |
+              ┌────────────┴────────────┐
+              ↓                         ↓
+     BUG REPORT PROCESSING       BUG REPORT UPLOAD
+          MODULE                  & STORAGE
+              |                         |
+              └────────────┬────────────┘
+                           ↓
+              BUG REPORT / SUBMISSION
+                    DATABASE
+                           |
+                           ↓
+                  AGENT ORCHESTRATOR
+                           |
+                           ↓
+                    AI AGENT LAYER
+                           |
+       ┌───────────┬───────┼────────┬────────────┐
+       ↓           ↓       ↓        ↓            ↓
+    TRIAGE      LOG     DUPLICATE  ROOT       REMEDIATION
+     AGENT    ANALYSIS  DETECTION  CAUSE         AGENT
+                AGENT      AGENT    AGENT
+                           |
+                           ↓
+                 RAG RETRIEVAL PIPELINE
+                           |
+                           ↓
+              VECTOR DATABASE / SEMANTIC
+                       SEARCH
+                           |
+                           ↓
+             HISTORICAL DEFECT KNOWLEDGE
+                       BASE
+                           |
+                           ↓
+                          LLM
+                           |
+                           ↓
+             STRUCTURED FINDINGS / DIAGNOSIS
+                           |
+                           ↓
+             RESULTS & RECOMMENDATIONS
+                       INTERFACE
+                           |
+                           ↓
+                    USER / DEVELOPER
+
+  
