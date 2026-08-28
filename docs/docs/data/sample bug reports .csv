@@ -1,0 +1,10 @@
+bug_id,source,title,description,component,status,resolution,comments
+MOZ-001,Mozilla,Application crashes during startup,"The browser crashes immediately after startup when the user opens the application.","Startup","RESOLVED","FIXED","The startup initialization sequence was corrected."
+MOZ-002,Mozilla,Memory leak in browser tab,"Memory usage continuously increases when multiple tabs are opened and closed repeatedly.","Memory Management","RESOLVED","FIXED","Memory resources were not released correctly."
+MOZ-003,Mozilla,Login page displays error,"Users receive an unexpected error when submitting valid login credentials.","Authentication","RESOLVED","FIXED","The authentication request handling was updated."
+APR-001,Apache,Server returns HTTP 500,"The server returns an HTTP 500 error when processing a specific request.","HTTP Server","RESOLVED","FIXED","Invalid request handling was corrected."
+APR-002,Apache,Configuration file not loaded,"The application fails to start because the configuration file is not loaded correctly.","Configuration","RESOLVED","FIXED","The configuration file path handling was corrected."
+APR-003,Apache,Database connection timeout,"The application reports a database connection timeout during high request volume.","Database","RESOLVED","FIXED","Connection pool configuration was improved."
+ECL-001,Eclipse,IDE freezes during build,"The IDE becomes unresponsive while building a large Java project.","Build System","RESOLVED","FIXED","Build process resource management was improved."
+ECL-002,Eclipse,Null pointer exception,"A null pointer exception occurs when opening a project with missing configuration information.","Project Management","RESOLVED","FIXED","Null value validation was added."
+ECL-003,Eclipse,Plugin installation fails,"Plugin installation fails when dependency information is incomplete.","Plugin System","RESOLVED","FIXED","Dependency validation was improved."
