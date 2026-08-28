@@ -1,0 +1,56 @@
+Historical Defect Dataset
+
+ Purpose
+
+This directory is used for the historical defect knowledge base of the Intelligent Bug Diagnosis Platform.
+
+The knowledge base will contain historical bug reports collected from publicly available Mozilla, Apache, and Eclipse bug datasets.
+
+ Dataset Sources
+
+The planned historical defect datasets are:
+
+- Mozilla bug reports
+- Apache bug reports
+- Eclipse bug reports
+
+These datasets are used to identify patterns in previously reported software defects and support semantic retrieval of similar historical bugs.
+
+ Data Processing
+
+The historical defect data will be processed through the following stages:
+
+1. Dataset collection
+2. Data cleaning
+3. Data standardization
+4. Bug report field extraction
+5. Text chunking
+6. Embedding generation
+7. Vector database indexing
+8. Semantic similarity search
+
+Bug Report Information
+
+Relevant information may include:
+
+- Bug ID
+- Bug title
+- Bug description
+- Stack trace
+- Error information
+- Comments
+- Affected component
+- Resolution
+- Status
+- Source repository
+
+Privacy and Licensing
+
+Only publicly available datasets will be used.
+
+Dataset licensing and usage conditions will be reviewed before incorporating datasets into the project.
+ Milestone
+
+This directory supports:
+
+Milestone 1 – M1.4 Historical Defect Knowledge Base
