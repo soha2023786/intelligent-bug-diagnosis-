@@ -1,0 +1,209 @@
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
+from datetime import datetime
+import sqlite3
+import uuid
+
+app = FastAPI(
+    title="Intelligent Bug Diagnosis Platform",
+    description="Bug Submission API for Milestone 1",
+    version="1.0.0"
+)
+
+# Allow frontend communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Directories
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+DATABASE = "bug_reports.db"
+
+# Supported file types
+ALLOWED_EXTENSIONS = {
+    ".txt",
+    ".log",
+    ".json",
+    ".csv"
+}
+
+
+def initialize_database():
+    """Create the bug reports table if it does not exist."""
+    connection = sqlite3.connect(DATABASE)
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS bug_reports (
+            submission_id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            stack_trace TEXT,
+            error_logs TEXT,
+            component TEXT,
+            file_name TEXT,
+            file_type TEXT,
+            status TEXT,
+            created_at TEXT
+        )
+    """)
+
+    connection.commit()
+    connection.close()
+
+
+initialize_database()
+
+
+@app.get("/")
+def home():
+    return {
+        "message": "Intelligent Bug Diagnosis Platform API",
+        "status": "running"
+    }
+
+
+@app.post("/api/bugs")
+def submit_bug(
+    title: str = Form(...),
+    description: str = Form(...),
+    stack_trace: str = Form(""),
+    error_logs: str = Form(""),
+    component: str = Form("")
+):
+    """Submit a bug report using direct text input."""
+
+    if not title.strip() or not description.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Bug title and description are required."
+        )
+
+    submission_id = f"BUG-{uuid.uuid4().hex[:8].upper()}"
+    created_at = datetime.now().isoformat()
+
+    connection = sqlite3.connect(DATABASE)
+
+    connection.execute("""
+        INSERT INTO bug_reports
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        submission_id,
+        title.strip(),
+        description.strip(),
+        stack_trace.strip(),
+        error_logs.strip(),
+        component.strip(),
+        None,
+        None,
+        "Submitted",
+        created_at
+    ))
+
+    connection.commit()
+    connection.close()
+
+    return {
+        "submission_id": submission_id,
+        "status": "Submitted",
+        "message": "Bug report submitted successfully."
+    }
+
+
+@app.post("/api/bugs/upload")
+async def upload_bug_file(
+    title: str = Form(...),
+    description: str = Form(...),
+    component: str = Form(""),
+    file: UploadFile = File(...)
+):
+    """Upload a bug report or log file."""
+
+    if not title.strip() or not description.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Bug title and description are required."
+        )
+
+    extension = Path(file.filename).suffix.lower()
+
+    if extension not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file format."
+        )
+
+    submission_id = f"BUG-{uuid.uuid4().hex[:8].upper()}"
+
+    safe_filename = f"{submission_id}{extension}"
+    file_path = UPLOAD_DIR / safe_filename
+
+    file_content = await file.read()
+
+    # Basic file size restriction: 5 MB
+    if len(file_content) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file exceeds the permitted size of 5 MB."
+        )
+
+    file_path.write_bytes(file_content)
+
+    created_at = datetime.now().isoformat()
+
+    connection = sqlite3.connect(DATABASE)
+
+    connection.execute("""
+        INSERT INTO bug_reports
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        submission_id,
+        title.strip(),
+        description.strip(),
+        "",
+        "",
+        component.strip(),
+        file.filename,
+        extension,
+        "Submitted",
+        created_at
+    ))
+
+    connection.commit()
+    connection.close()
+
+    return {
+        "submission_id": submission_id,
+        "status": "Submitted",
+        "message": "Bug report and file submitted successfully.",
+        "file_name": file.filename
+    }
+
+
+@app.get("/api/bugs/{submission_id}")
+def get_bug(submission_id: str):
+    """Retrieve a submitted bug report."""
+
+    connection = sqlite3.connect(DATABASE)
+    connection.row_factory = sqlite3.Row
+
+    bug = connection.execute(
+        "SELECT * FROM bug_reports WHERE submission_id = ?",
+        (submission_id,)
+    ).fetchone()
+
+    connection.close()
+
+    if bug is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Bug report not found."
+        )
+
+    return dict(bug)
